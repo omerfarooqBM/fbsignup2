@@ -9,6 +9,8 @@ firebase.auth().onAuthStateChanged((user) => {
       let username=document.getElementById("username");
       let email=document.getElementById("email");
       let DOB=document.getElementById("DOB");
+      let userprofile = document.getElementById("userprofile");
+      userprofile.setAttribute('src', data.val().profile)
       loader.style.display="none"
       username.innerHTML=data.val().username;
       email.innerHTML="Email: "+data.val().email;
@@ -23,6 +25,34 @@ firebase.auth().onAuthStateChanged((user) => {
      
     }
   });
+
+  let uploadFiles = (file) => {
+    return new Promise((resolve, reject) => {
+        let storageRef = firebase.storage().ref(`myfolder/todayImages/${file.name}`);
+        let uploading = storageRef.put(file)
+        uploading.on('state_changed',
+            (snapshot) => {
+
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED:
+                        console.log('Upload is paused');
+                        break;
+                    case firebase.storage.TaskState.RUNNING:
+                        console.log('Upload is running');
+                        break;
+                }
+            },
+            (error) => {
+                reject(error)
+            },
+            () => {
+                uploading.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    resolve(downloadURL)
+                });
+            }
+        );
+    })
+}
 
 
   edit=()=>{
@@ -63,11 +93,12 @@ firebase.auth().onAuthStateChanged((user) => {
   }
 
 
- saveProfile=()=>{
+ saveProfile=async()=>{
 
   let eusername=document.getElementById("eusername");
   let EDOB=document.getElementById("EDOB");
   let Eemail=document.getElementById("Eemail");
+  
 
   let user = firebase.auth().currentUser;
   let uid;
@@ -79,9 +110,9 @@ firebase.auth().onAuthStateChanged((user) => {
       username: eusername.value,
       email:Eemail.value,
       DOB: EDOB.value,
-      
+  
   }
-  firebaseRef.child(`users/${uid}`).set(userData);
+  firebaseRef.child(`users/${uid}`).update(userData);
   console.log(userData)
   setTimeout(()=>{
     window.location="profile.html"
@@ -109,6 +140,19 @@ firebase.auth().onAuthStateChanged((user) => {
 //     })
 // });
   
+let updateProfile = async () => {
+  let editProfile = document.getElementById('editProfile');
+  let closeBtn = document.getElementById('closeBtn');
+  let userprofile = document.getElementById("userprofile");
+  let uploadedImage = await uploadFiles(editProfile.files[0])
+  firebase.auth().onAuthStateChanged((user) => {
+      firebase.database().ref(`users/${user.uid}`).update({ profile: uploadedImage })
+          .then(() => {
+              userprofile.setAttribute('src', uploadedImage)
+              closeBtn.click()
+          })
+  })
+}
 
 let logout=()=>{
     firebase.auth().signOut()
