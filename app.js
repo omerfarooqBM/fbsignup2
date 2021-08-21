@@ -1,3 +1,36 @@
+let uploadFiles = (file) => {
+  return new Promise((resolve, reject) => {
+      let storageRef = firebase.storage().ref(`myfolder/todayImages/${file.name}`);
+      let progress1 = document.getElementById("progress");
+      let bar = document.getElementById("bar");
+      progress1.style.display = "block"
+      let uploading = storageRef.put(file)
+      uploading.on('state_changed',
+          (snapshot) => {
+              var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              bar.style.width = Math.round(progress.toFixed()) + "%";
+              bar.innerHTML = Math.round(progress.toFixed()) + "%";
+              switch (snapshot.state) {
+                  case firebase.storage.TaskState.PAUSED:
+                      console.log('Upload is paused');
+                      break;
+                  case firebase.storage.TaskState.RUNNING:
+                      console.log('Upload is running');
+                      break;
+              }
+          },
+          (error) => {
+              reject(error)
+          },
+          () => {
+              uploading.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                  resolve(downloadURL)
+              });
+          }
+      );
+  })
+}
+
 // firebase.auth().onAuthStateChanged((user) => {
 //   if (user) {
 //     window.location="profile.html"
@@ -8,12 +41,13 @@
 // });
 
 
-let register=()=>{
+let register= async ()=>{
     let username=document.getElementById("username");
     let email=document.getElementById("email");
     let password=document.getElementById("password");
     let DOB=document.getElementById("DOB");
-    
+    let profile = document.getElementById("profile");
+    let image = await uploadFiles(profile.files[0]);
     let loaderText=document.getElementById("loaderText");
     let loader=document.getElementById("loader");
     loaderText.style.display="none";
@@ -24,7 +58,8 @@ let register=()=>{
         username:username.value,
         email:email.value,
         password:password.value,
-        DOB:DOB.value
+        DOB:DOB.value,
+        profile: image
 
       })
       .then(() => {
