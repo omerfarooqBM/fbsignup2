@@ -41,6 +41,11 @@
                     <label for="exampleInputPassword1">Password</label>
                     <input type="password" class="form-control" id="password">
                 </div>
+                <div class="form-group">
+                    <label for="exampleFormControlFile1">Example file input</label>
+                    <br />
+                    <input type="file" class="form-control-file" id="profile">
+                </div>
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" id="exampleCheck1">
                     <label class="form-check-label" for="exampleCheck1">Check me out</label>
@@ -50,8 +55,16 @@
                     <div id="loader" style="display: none;" class="spinner-border" role="status">
                         <span class="visually-hidden"></span>
                       </div>
+                      
                 
                 </button>
+                <br>
+                      <br>
+                      <br>
+                      <div style="display: none;" class="progress" id="progress">
+                        <div id="bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25"
+                            aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
                 
             </div>
             <div style="display: none;" id="errorDiv" class="alert alert-danger mt-20 " role="alert">
@@ -69,6 +82,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.9.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.9.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.9.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.9.0/firebase-storage.js"></script>
 
 <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
